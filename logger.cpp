@@ -1,11 +1,24 @@
 #include "logger.h"
 
 #include <cassert>
+#include <chrono>
+#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 
 namespace
 {
+
+const std::tm currentTime()
+{
+    using namespace std::chrono;
+
+    const time_t now = system_clock::to_time_t(system_clock::now());
+    std::tm result = *std::localtime(&now);
+
+    return result;
+}
 
 Logger::Device operator& (Logger::Device lhs,
                           Logger::Device rhs)
@@ -114,8 +127,9 @@ private:
                               const std::string& levelLabel,
                               const std::string& message)
     {
-        // TODO: add time
-        device << "["
+        const std::tm tm = ::currentTime();
+        device << std::put_time(&tm, "%H:%M:%S")
+               << " ["
                << levelLabel
                << "]: "
                << message
